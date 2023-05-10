@@ -198,7 +198,7 @@ const Home = () => {
           <div className="header">
             <div className="img-text">
               <div className="user-img">
-                <img className="dp" src="https://www.codewithfaraz.com/InstaPic.png" alt="" />
+                <img className="dp" src={`/users/1.jpg`} />
               </div>
               <h4>PYrates Team<br /><span>Online</span></h4>
             </div>
@@ -210,7 +210,7 @@ const Home = () => {
 
           <div className="chat-container">
 
-            {allMessage && allMessage.map((item, index) => {
+            {allMessage.length ? allMessage.map((item, index) => {
               return <>
                 <div key={index} className={`message-box ${item.id === userData.id ? 'my-message' : 'friend-message'} `}>
                   <p>
@@ -220,7 +220,7 @@ const Home = () => {
                   </p>
                 </div>
               </>
-            })}
+            }) : null}
 
           </div>
 

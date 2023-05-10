@@ -92,7 +92,6 @@ body > div {
   width: 40px;
   height: 40px;
   overflow: hidden;
-  border-radius: 50%;
   flex-shrink: 0;
 }
 
@@ -103,6 +102,7 @@ body > div {
   left: 0;
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   object-fit: cover;
   cursor: pointer;
 }
@@ -318,7 +318,7 @@ img {
 
 .right-container .header .img-text .user-img .dp {
   position: relative;
-  top: -2px;
+  top: 0px;
   left: 0px;
   width: 40px;
   height: auto;

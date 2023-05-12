@@ -576,3 +576,70 @@ img {
 
 
 
+
+
+
+
+
+
+
+
+.login_wrrpr{
+  position: relative;
+  width: calc(100% - 30px);
+  margin: auto;
+  max-width: 100%;
+  height: calc(100vh - 40px);
+  background: rgb(255 255 255 / 90%);
+  display: flex;
+}
+.container{
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+}
+.login_dv{}
+.login_dv ul{
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.login_dv ul li{}
+.login_dv ul li p{
+  padding: 5px;
+  width: 200px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #e6f5f3;
+  text-transform: capitalize;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

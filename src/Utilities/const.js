@@ -8,9 +8,28 @@ const surnames = ['Smith', 'Johnson', 'Williams', 'Jones', 'Brown', 'Garcia', 'M
 let randomName = names[Math.floor(Math.random() * names.length)];
 let randomSurname = surnames[Math.floor(Math.random() * surnames.length)];
 
-export const createNewName = () =>{
+export const createNewName = () => {
   return `${randomName} ${randomSurname}`
 }
+
+
+
+
+
+export const dummyUsers = [
+  { id: 'kjd94jg9ed93', name: 'Paul Martin' },
+  { id: 'fi94jf7sjd84', name: 'Julia Williams' },
+  // {id:'d9d8ij9rjr43',name:'William Young'},
+  // {id:'k9ejrf93ng95',name:'Yara Thomas'},
+  // {id:'j398erfh3r9j',name:'Zoe Carter'},
+  // {id:'kwe98329wef3',name:'Eve Jones'},
+  // {id:'hi298er4ywd2',name:'Una Perez'},
+  // {id:'io23u98hi30f',name:'Nate Gray'},
+  // {id:'ihwe723hi347',name:'Bob Lopez'},
+  // {id:'ejoi3498iwf9',name:'Paul Cooper'},
+]
+
+
 
 
 

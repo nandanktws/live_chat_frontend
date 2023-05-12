@@ -1,6 +1,7 @@
 import { createNewName } from '@/Utilities/const'
+import { MyContext } from '@/context/myContext'
 import moment from 'moment/moment'
-import React, { useRef, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 
 import { useEffect } from 'react'
 import io from 'socket.io-client'
@@ -9,6 +10,7 @@ let socket
 
 
 const Home = () => {
+  const { myState } = useContext(MyContext);
 
   const [allMessage, setAllMessage] = useState([])
   const [allUsers, setAllUsers] = useState([])
@@ -34,11 +36,12 @@ const Home = () => {
 
     if (!socketAssign.current) {
       socket.on('userInfo', (e) => {
-        setUserData({ id: e, name: newPickupName, image: newPickupImage })
-        socket.emit('allUsers', { id: e, name: newPickupName, image: newPickupImage, type: 'user' });
+        setUserData({ socketId: e, })
+        socket.emit('userInfo', { socketId: e, userId: myState.userID });
       });
       socketAssign.current = true;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
 
@@ -47,14 +50,39 @@ const Home = () => {
 
   const socketInitializer = async () => {
 
-    socket.on('allUsers', (e) => {
-      setAllUsers(e)
+
+    socket.on('userInfo', (e) => {
+      console.log('userInfo e', e);
+      setUserData({
+        socketId: userData.socketId,
+        userId: e.id,
+        name: e.name,
+        image: e.image,
+        online_status: e.online_status,
+      })
+    });
+
+    // socket.on('userChatList', (myChatsList) => {
+    //   console.log('userChatList', myChatsList);
+    //   setAllUsers(myChatsList)
+    // });
+
+
+
+    socket.on('userChatsMessages', (e) => {
+      setAllMessage(e)
+      console.log(e);
     });
 
     socket.on('allMessage', (e) => {
       setAllMessage(e)
     });
 
+
+
+
+
+    { console.log('userInfo state', userData) }
   }
 
 
@@ -77,7 +105,6 @@ const Home = () => {
 
 
 
-
       <div className="background-green"></div>
 
 
@@ -86,7 +113,7 @@ const Home = () => {
 
           <div className="header">
             <div className="user-img">
-              <img className="dp" src={`/users/${userData.image}.jpg`} alt={userData.name} />
+              <img className="dp" src={`/users/${userData.image}`} alt={userData.name} />
             </div>
             <p className='user-name'>{userData.name}</p>
             {/* <div className="nav-icons">
@@ -135,16 +162,52 @@ const Home = () => {
             </div> */}
 
 
-            {allUsers && allUsers.map((item, index) => {
-              return <>
-                <div key={index} className={`chat-box ${index === 0 ? 'active' : ''}`}>
-                  <div className="img-box">
-                    <img className="img-cover" src={`/users/${item.image}.jpg`} alt={item.name} />
-                  </div>
-                  <div className="chat-details">
-                    <div className="text-head">
-                      <h4>{item.name}</h4>
 
+            {allMessage && allMessage.map((item, index) => {
+              return <>
+
+
+                {item.info.type === 'group' ? <>
+                  <div key={index} className={`chat-box ${index === 0 ? 'active' : ''}`}>
+                    <div className="img-box">
+                      <img className="img-cover" src={`/users/${item.info.image}`} alt={item.info.name} />
+                    </div>
+                    <div className="chat-details">
+
+                      <div className="text-head">
+                        <h4>{item.info.name}</h4>
+                        <p className="time unread">{moment(item.messages[0].time).format('hh:mm a')}</p>
+                      </div>
+                      <div className="text-message">
+                        {item.messages.length ? <p>“{(item.messages[0].message).slice(0, 50)}”</p> : ''}
+                        {item.messages.length ? <b>{item.messages.length}</b> : ''}
+                      </div>
+
+                    </div>
+                  </div>
+                </> : (
+                  '12'
+                )}
+
+
+
+
+
+
+
+
+
+
+                {/* <div key={index} className={`chat-box ${index === 0 ? 'active' : ''}`}>
+                  <div className="img-box">
+                    <img className="img-cover" src={`/users/${item.image}`} alt={item.name} />
+                  </div>
+                  <div className="chat-details"> */}
+
+
+
+                {/* <div className="text-head">
+                      <h4>{item.name}</h4>
                       {index === 0 ? <>
                         {allMessage.length ? <p className="time unread">{moment(allMessage[0].time).format('hh:mm a')}</p> : ''}
                       </> : (
@@ -160,8 +223,8 @@ const Home = () => {
                           </p>
                         </>
                       )}
-                    </div>
-                    <div className="text-message">
+                    </div> */}
+                {/* <div className="text-message">
                       {index === 0 ? <>
                         {allMessage.length ? <p>“{(allMessage[0].msg).slice(0, 50)}”</p> : ''}
                         {allMessage.length ? <b>{allMessage.length}</b> : ''}
@@ -177,9 +240,14 @@ const Home = () => {
                           }).length}</b>
                         </>
                       )}
-                    </div>
-                  </div>
-                </div>
+                    </div> */}
+
+
+
+
+
+                {/* </div> */}
+                {/* </div> */}
               </>
             })}
 
@@ -210,17 +278,19 @@ const Home = () => {
 
           <div className="chat-container">
 
-            {allMessage.length ? allMessage.map((item, index) => {
+            {/* {console.log('allMessage', allMessage)} */}
+
+            {/* {allMessage.length ? allMessage.map((item, index) => {
               return <>
-                <div key={index} className={`message-box ${item.id === userData.id ? 'my-message' : 'friend-message'} `}>
+                <div key={index} className={`message-box ${item.id === userData.userId ? 'my-message' : 'friend-message'} `}>
                   <p>
                     {item.name && <><i>{item.name}</i><br /></>}
-                    {item.msg && <b>{item.msg}</b>}
+                    {item.message && <b>{item.message}</b>}
                     {item.time && <span>{moment(item.time).format('hh:mm a')}</span>}
                   </p>
                 </div>
               </>
-            }) : null}
+            }) : null} */}
 
           </div>
 

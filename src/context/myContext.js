@@ -1,4 +1,4 @@
-import React, { useReducer, createContext, useCallback } from 'react'
+import React, { useReducer, createContext, useCallback, useEffect } from 'react'
 
 import * as types from "./myReducer";
 import myReducer from "./myReducer";
@@ -8,11 +8,11 @@ import axios from 'axios';
 // import { API_URL } from '../const';
 
 const initialState = {
-  // user: false,
-  // userID: null,
+  user: false,
+  userID: null,
 
-  user: true,
-  userID: 'fi94jf7sjd84',
+  // user: true,
+  // userID: 'fi94jf7sjd84',
 };
 
 export const MyContext = createContext(initialState);
@@ -31,8 +31,40 @@ export const MyProvider = ({ children }) => {
       type: types.SET_USER_ID,
       payload: id
     });
+    localStorage.setItem('whatsapp_token', id)
   }
 
+
+
+  const initAuth = () => {
+    let localToken = localStorage.getItem('whatsapp_token')
+    if (localToken) {
+      loginAPI(localToken)
+    }
+  }
+
+  useEffect(() => {
+    initAuth()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+
+
+
+
+
+
+  const logoutAction = (id) => {
+    dispatch({
+      type: types.SET_USER_ACIVE,
+      payload: false
+    });
+    dispatch({
+      type: types.SET_USER_ID,
+      payload: null
+    });
+    localStorage.getItem('whatsapp_token')
+  }
 
 
 
@@ -135,7 +167,8 @@ export const MyProvider = ({ children }) => {
     <MyContext.Provider
       value={{
         myState,
-        loginAPI
+        loginAPI,
+        logoutAction
       }}
     >
       {" "} {children} {" "}

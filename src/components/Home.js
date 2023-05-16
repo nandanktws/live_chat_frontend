@@ -1,6 +1,7 @@
-import { createNewName } from '@/Utilities/const'
+import { createNewName, getOtherUsersIDs } from '@/Utilities/const'
 import { MyContext } from '@/context/myContext'
 import moment from 'moment/moment'
+import Image from 'next/image'
 import React, { useContext, useRef, useState } from 'react'
 
 import { useEffect } from 'react'
@@ -10,13 +11,15 @@ let socket
 
 
 const Home = () => {
-  const { myState } = useContext(MyContext);
+  const { myState, logoutAction } = useContext(MyContext);
 
   const [allMessage, setAllMessage] = useState([])
   const [allUsers, setAllUsers] = useState([])
 
   const [myMessage, setMyMessage] = useState('')
   const [userData, setUserData] = useState([])
+
+  const [activeTabMenu, setActiveTabMenu] = useState(null)
 
 
 
@@ -71,12 +74,26 @@ const Home = () => {
 
     socket.on('userChatsMessages', (e) => {
       setAllMessage(e)
-      console.log(e);
+      console.log('userChatsMessages', e);
+      // getUsersByIds(e)
     });
 
+
+    // socket.on('getUsersByIds', (e) => {
+    //   setAllUsers(e)
+    // });
+
+
+
+
+
     socket.on('allMessage', (e) => {
-      setAllMessage(e)
+      console.log('allMessage recive',
+        e
+      );
+      // setAllMessage(e)
     });
+
 
 
 
@@ -87,12 +104,26 @@ const Home = () => {
 
 
 
+  // const getUsersByIds = (e) => {
+  //   let getOnlyUsrsIDs = e.map((item) => {
+  //     return item.users
+  //   })
+  //   let otherUserIDs = [...new Set(getOnlyUsrsIDs.flat())].filter(item => item !== myState.userID)
+  //   socket.emit('getUsersByIds', otherUserIDs);
+  // }
+
+
+
 
 
   const handleMyMessage = (e) => {
     const curruntTime = new Date();
     if (e.keyCode === 13 && myMessage !== '' && myMessage !== ' ') {
-      socket.emit('myMessage', { id: userData.id, msg: myMessage, time: curruntTime, name: newPickupName });
+      socket.emit('myMessage', { id: myState.userID, message: myMessage, time: curruntTime, roomId: activeTabMenu });
+      console.log('myMessage',
+        'userId:', myState.userID, 'message:', myMessage, 'time:', curruntTime, 'roomId:', activeTabMenu
+      );
+
       setMyMessage('')
     }
   }
@@ -113,7 +144,14 @@ const Home = () => {
 
           <div className="header">
             <div className="user-img">
-              <img className="dp" src={`/users/${userData.image}`} alt={userData.name} />
+              {/* <img className="dp" src={`/users/${userData.image}`} alt={userData.name} /> */}
+              <Image
+                className="dp"
+                src={`/users/${userData.image}`}
+                width={40}
+                height={40}
+                alt={userData.name}
+              />
             </div>
             <p className='user-name'>{userData.name}</p>
             {/* <div className="nav-icons">
@@ -146,31 +184,21 @@ const Home = () => {
           <div className="chat-list">
 
 
-            {/* <div className="chat-box active">
-              <div className="img-box">
-                <img className="img-cover" src="https://www.codewithfaraz.com/InstaPic.png" alt="" />
-              </div>
-              <div className="chat-details">
-                <div className="text-head">
-                  <h4>PYrates Team</h4>
-                  <p className="time">07:49</p>
-                </div>
-                <div className="text-message">
-                  <p>Awesome! I will start a vid..</p>
-                </div>
-              </div>
-            </div> */}
 
 
 
             {allMessage && allMessage.map((item, index) => {
               return <>
-
-
                 {item.info.type === 'group' ? <>
-                  <div key={index} className={`chat-box ${index === 0 ? 'active' : ''}`}>
+                  <div key={index} className={`chat-box ${item.info.room_id === activeTabMenu ? 'active' : ''}`} onClick={() => { setActiveTabMenu(item.info.room_id) }}>
                     <div className="img-box">
-                      <img className="img-cover" src={`/users/${item.info.image}`} alt={item.info.name} />
+                      <Image
+                        className="img-cover"
+                        src={`/users/${item.info.image}`}
+                        width={45}
+                        height={45}
+                        alt={item.info.name}
+                      />
                     </div>
                     <div className="chat-details">
 
@@ -185,9 +213,31 @@ const Home = () => {
 
                     </div>
                   </div>
-                </> : (
-                  '12'
-                )}
+                </> : <>
+                  <div key={index} className={`chat-box ${item.info.room_id === activeTabMenu ? 'active' : ''}`} onClick={() => { setActiveTabMenu(item.info.room_id) }}>
+                    <div className="img-box">
+                      <Image
+                        className="img-cover"
+                        src={`/users/${item.otherUser.image}`}
+                        width={45}
+                        height={45}
+                        alt={item.otherUser.name}
+                      />
+                    </div>
+                    <div className="chat-details">
+
+                      <div className="text-head">
+                        <h4>{item.otherUser.name}</h4>
+                        <p className="time unread">{moment(item.messages[0].time).format('hh:mm a')}</p>
+                      </div>
+                      <div className="text-message">
+                        {item.messages.length ? <p>“{(item.messages[0].message).slice(0, 50)}”</p> : ''}
+                        {item.messages.length ? <b>{item.messages.length}</b> : ''}
+                      </div>
+
+                    </div>
+                  </div>
+                </>}
 
 
 
@@ -266,46 +316,64 @@ const Home = () => {
           <div className="header">
             <div className="img-text">
               <div className="user-img">
-                <img className="dp" src={`/users/1.jpg`} />
+                <Image
+                  className="dp"
+                  src={`/users/1.jpg`}
+                  width={40}
+                  height={40}
+                  alt="name"
+                />
               </div>
               <h4>PYrates Team<br /><span>Online</span></h4>
             </div>
             <div className="nav-icons">
               <li><i className="fa-solid fa-magnifying-glass"></i></li>
-              <li><i className="fa-solid fa-ellipsis-vertical"></i></li>
+              {/* <li><i className="fa-solid fa-ellipsis-vertical"></i></li> */}
+              <li><i class="fa-solid fa-arrow-right-from-bracket" onClick={() => { (logoutAction()) }}></i></li>
             </div>
           </div>
 
           <div className="chat-container">
 
-            {/* {console.log('allMessage', allMessage)} */}
+            {
+              console.log('allMessage',
+                allMessage
+              )
+            }
 
-            {/* {allMessage.length ? allMessage.map((item, index) => {
+            {activeTabMenu && allMessage.find((item) => item.info.room_id === activeTabMenu).messages.map((item, index) => {
               return <>
                 <div key={index} className={`message-box ${item.id === userData.userId ? 'my-message' : 'friend-message'} `}>
                   <p>
+                    {item.id && <><i>{item.id} 111</i><br /></>}
+
                     {item.name && <><i>{item.name}</i><br /></>}
                     {item.message && <b>{item.message}</b>}
                     {item.time && <span>{moment(item.time).format('hh:mm a')}</span>}
                   </p>
                 </div>
               </>
-            }) : null} */}
+            })}
+
+
 
           </div>
 
-          <div className="chatbox-input">
-            <i className="fa-regular fa-face-grin"></i>
-            <i className="fa-sharp fa-solid fa-paperclip"></i>
-            <input
-              type="text"
-              value={myMessage}
-              placeholder="Type a message"
-              onChange={(e) => { setMyMessage(e.target.value) }}
-              onKeyUp={(e) => { handleMyMessage(e) }}
-            />
-            <i className="fa-solid fa-microphone"></i>
-          </div>
+
+          {activeTabMenu && <>
+            <div className="chatbox-input">
+              <i className="fa-regular fa-face-grin"></i>
+              <i className="fa-sharp fa-solid fa-paperclip"></i>
+              <input
+                type="text"
+                value={myMessage}
+                placeholder="Type a message"
+                onChange={(e) => { setMyMessage(e.target.value) }}
+                onKeyUp={(e) => { handleMyMessage(e) }}
+              />
+              <i className="fa-solid fa-microphone"></i>
+            </div>
+          </>}
         </div>
 
       </div>

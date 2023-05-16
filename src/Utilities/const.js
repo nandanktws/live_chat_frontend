@@ -19,7 +19,7 @@ export const createNewName = () => {
 export const dummyUsers = [
   { id: 'kjd94jg9ed93', name: 'Paul Martin' },
   { id: 'fi94jf7sjd84', name: 'Julia Williams' },
-  // {id:'d9d8ij9rjr43',name:'William Young'},
+  {id:'d9d8ij9rjr43',name:'William Young'},
   // {id:'k9ejrf93ng95',name:'Yara Thomas'},
   // {id:'j398erfh3r9j',name:'Zoe Carter'},
   // {id:'kwe98329wef3',name:'Eve Jones'},
@@ -28,6 +28,34 @@ export const dummyUsers = [
   // {id:'ihwe723hi347',name:'Bob Lopez'},
   // {id:'ejoi3498iwf9',name:'Paul Cooper'},
 ]
+
+
+
+
+
+
+
+export const getOtherUsersIDs = (myId, allUsersIDs) => {
+  console.log('getUsersByIds const', allUsersIDs);
+
+  return
+
+
+
+
+  // if (myId && allUsersIDs) {
+  //   let filterSingleUserId = allUsersIDs.indexOf(myId)
+  //   let userIDsStroed = allUsersIDs.splice(filterSingleUserId, 1)
+  //   return userIDsStroed.length <= 1 ? userIDsStroed[0] : userIDsStroed
+  // }
+  // else {
+  //   return
+  // }
+}
+
+
+
+
 
 
 

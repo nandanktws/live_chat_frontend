@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import Home from '@/components/Home'
-import { MyContext } from '@/context/myContext';
+import { MyContext } from '@/provider/context/myContext';
 import Head from 'next/head'
 import { useRouter } from 'next/router';
 

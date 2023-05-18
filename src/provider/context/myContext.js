@@ -63,7 +63,7 @@ export const MyProvider = ({ children }) => {
       type: types.SET_USER_ID,
       payload: null
     });
-    localStorage.getItem('whatsapp_token')
+    localStorage.removeItem('whatsapp_token')
   }
 
 

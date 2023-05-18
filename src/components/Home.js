@@ -1,5 +1,5 @@
-import { createNewName, getOtherUsersIDs } from '@/Utilities/const'
-import { MyContext } from '@/context/myContext'
+// import { createNewName, getOtherUsersIDs } from '@/Utilities/global_functions'
+import { MyContext } from '@/provider/context/myContext'
 import moment from 'moment/moment'
 import Image from 'next/image'
 import React, { useContext, useRef, useState } from 'react'
@@ -14,7 +14,7 @@ const Home = () => {
   const { myState, logoutAction } = useContext(MyContext);
 
   const [allMessage, setAllMessage] = useState([])
-  const [allUsers, setAllUsers] = useState([])
+  // const [allUsers, setAllUsers] = useState([])
 
   const [myMessage, setMyMessage] = useState('')
   const [userData, setUserData] = useState([])
@@ -24,8 +24,8 @@ const Home = () => {
 
 
 
-  let newPickupName = createNewName();
-  let newPickupImage = Math.floor(Math.random() * 11) + 10;
+  // let newPickupName = createNewName();
+  // let newPickupImage = Math.floor(Math.random() * 11) + 10;
 
 
 
@@ -71,9 +71,11 @@ const Home = () => {
     // });
 
 
+    // let allMessageTemp = []
 
     socket.on('userChatsMessages', (e) => {
       setAllMessage(e)
+      // allMessageTemp.push(e)
       console.log('userChatsMessages', e);
       // getUsersByIds(e)
     });
@@ -87,11 +89,15 @@ const Home = () => {
 
 
 
-    socket.on('allMessage', (e) => {
-      console.log('allMessage recive',
-        e
-      );
-      // setAllMessage(e)
+    socket.on('newMessage', (e) => {
+      console.log('newMessage recived', e);
+      setNewMessageToLocal(e)
+
+      // console.log('newMessage set',
+      //   allMessage
+      // );
+
+
     });
 
 
@@ -101,6 +107,30 @@ const Home = () => {
 
     { console.log('userInfo state', userData) }
   }
+
+
+
+
+  const [newMessageToLocal, setNewMessageToLocal] = useState(null)
+
+  useEffect(() => {
+    console.log('newMessage new', newMessageToLocal);
+    console.log('newMessage updated', allMessage);
+    console.log('newMessage close', '===================');
+
+    newMessageToLocal && (
+      allMessage.some((item) => item.messages !== newMessageToLocal.time)
+    ) && (
+        allMessage.map((item) => {
+          return item.info.room_id === newMessageToLocal.roomId ? (
+            item.messages.unshift(newMessageToLocal)
+          ) : item
+        })
+      )
+    setNewMessageToLocal(null)
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newMessageToLocal])
 
 
 
@@ -345,9 +375,9 @@ const Home = () => {
               return <>
                 <div key={index} className={`message-box ${item.id === userData.userId ? 'my-message' : 'friend-message'} `}>
                   <p>
-                    {item.id && <><i>{item.id} 111</i><br /></>}
+                    {item.id && <><i>#{item.id}</i><br /></>}
 
-                    {item.name && <><i>{item.name}</i><br /></>}
+                    {/* {item.name && <><i>{item.name}</i><br /></>} */}
                     {item.message && <b>{item.message}</b>}
                     {item.time && <span>{moment(item.time).format('hh:mm a')}</span>}
                   </p>

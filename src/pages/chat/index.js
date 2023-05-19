@@ -1,10 +1,9 @@
-import React from 'react'
-import Login from './Login'
+import ChatHome from './ChatHome'
 
 const index = () => {
   return (
     <>
-      <Login />
+      <ChatHome />
     </>
   )
 }

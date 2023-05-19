@@ -1,27 +1,25 @@
-// import { createNewName, getOtherUsersIDs } from '@/Utilities/global_functions'
-import { MyContext } from '@/provider/context/myContext'
+import { logoutAction } from '@/provider/redux/action/authAction'
 import moment from 'moment/moment'
 import Image from 'next/image'
-import React, { useContext, useRef, useState } from 'react'
+import React, {   useRef, useState } from 'react'
 
 import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import io from 'socket.io-client'
 
 let socket
 
 
 const Home = () => {
-  const { myState, logoutAction } = useContext(MyContext);
+  const authState = useSelector((state) => state.authRootState)
+  const dispatch = useDispatch()
 
   const [allMessage, setAllMessage] = useState([])
-  // const [allUsers, setAllUsers] = useState([])
 
   const [myMessage, setMyMessage] = useState('')
   const [userData, setUserData] = useState([])
 
   const [activeTabMenu, setActiveTabMenu] = useState(null)
-
-
 
 
   // let newPickupName = createNewName();
@@ -40,7 +38,7 @@ const Home = () => {
     if (!socketAssign.current) {
       socket.on('userInfo', (e) => {
         setUserData({ socketId: e, })
-        socket.emit('userInfo', { socketId: e, userId: myState.userID });
+        socket.emit('userInfo', { socketId: e, userId: authState.userID });
       });
       socketAssign.current = true;
     }
@@ -134,13 +132,7 @@ const Home = () => {
 
 
 
-  // const getUsersByIds = (e) => {
-  //   let getOnlyUsrsIDs = e.map((item) => {
-  //     return item.users
-  //   })
-  //   let otherUserIDs = [...new Set(getOnlyUsrsIDs.flat())].filter(item => item !== myState.userID)
-  //   socket.emit('getUsersByIds', otherUserIDs);
-  // }
+ 
 
 
 
@@ -149,9 +141,9 @@ const Home = () => {
   const handleMyMessage = (e) => {
     const curruntTime = new Date();
     if (e.keyCode === 13 && myMessage !== '' && myMessage !== ' ') {
-      socket.emit('myMessage', { id: myState.userID, message: myMessage, time: curruntTime, roomId: activeTabMenu });
+      socket.emit('myMessage', { id: authState.userID, message: myMessage, time: curruntTime, roomId: activeTabMenu });
       console.log('myMessage',
-        'userId:', myState.userID, 'message:', myMessage, 'time:', curruntTime, 'roomId:', activeTabMenu
+        'userId:', authState.userID, 'message:', myMessage, 'time:', curruntTime, 'roomId:', activeTabMenu
       );
 
       setMyMessage('')
@@ -359,17 +351,13 @@ const Home = () => {
             <div className="nav-icons">
               <li><i className="fa-solid fa-magnifying-glass"></i></li>
               {/* <li><i className="fa-solid fa-ellipsis-vertical"></i></li> */}
-              <li><i class="fa-solid fa-arrow-right-from-bracket" onClick={() => { (logoutAction()) }}></i></li>
+              <li><i class="fa-solid fa-arrow-right-from-bracket" onClick={()=>{dispatch(logoutAction())}}></i></li>
             </div>
           </div>
 
           <div className="chat-container">
 
-            {
-              console.log('allMessage',
-                allMessage
-              )
-            }
+            {console.log('allMessage', allMessage)}
 
             {activeTabMenu && allMessage.find((item) => item.info.room_id === activeTabMenu).messages.map((item, index) => {
               return <>

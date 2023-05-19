@@ -7,7 +7,7 @@ const initialState = {
 
 
   
-const authManagement = (state = initialState, action) => {
+const chatManagement = (state = initialState, action) => {
   switch (action.type) {
     case "UPDATE_USER": return {
       ...state,
@@ -25,4 +25,4 @@ const authManagement = (state = initialState, action) => {
 
 
   
-export default authManagement;
+export default chatManagement;

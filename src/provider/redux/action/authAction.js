@@ -1,53 +1,33 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-
-
 export const UPDATE_USER = "UPDATE_USER";
 export const UPDATE_USER_ID = "UPDATE_USER_ID";
 
 
 
 
-// export const loginAPI = id => {
-//   console.log('loginAPI', id);
-//   return dispatch => {
-//     dispatch({
-//       type: UPDATE_USER,
-//       payload: true
-//     });
-//     dispatch({
-//       type: UPDATE_USER_ID,
-//       payload: id
-//     });
-//     localStorage.setItem('whatsapp_token', id)
-//   }
-   
-// }
 
+export const loginAPI = (id) => {
+  return dispatch => {
+    return new Promise((response, error) => {
+      dispatch(userStatusUpdateAction(true));
+      dispatch(userIdUpdateAction(id));
+      localStorage.setItem('whatsapp_token', id);
 
-export const loginAPI = createAsyncThunk('user/loginAPI', async (id, { dispatch }) => {
-  console.log('loginAPI 5555555555555555555', id);
-  dispatch(lessNumber(id));
-  dispatch(addNumber(id));
-
-  
-  localStorage.setItem('whatsapp_token', id)
-}); 
+      response('Login successful'); // Resolve with the desired response
+      error('Login NoOoOoo'); // Resolve with the desired response
+    });
+  };
+};
 
 
 
-export const lessNumber = (id) => {
-  console.log('lessNumber', id);
-  return {
-    type: UPDATE_USER,
-    payload: true
-  }
-}
-export const addNumber = (id) => {
-  console.log('addNumber', id);
-  return {
-    type: UPDATE_USER_ID,
-    payload: id
-  }
+
+
+export const logoutAction = (id) => {
+  return dispatch => {
+    dispatch(userStatusUpdateAction(false));
+    dispatch(userIdUpdateAction(null));
+    localStorage.removeItem('whatsapp_token');
+  };
 };
 
 
@@ -55,29 +35,20 @@ export const addNumber = (id) => {
 
 
 
-// export const fetchAuctions = auctions => {
-//   return dispatch => {
-//     axios.get(GET_PRODUCTS,
-//       {
-//         params: {
-//           product_type: "Auction"
-//         }
-//       }
-//     )
-//       .then(response => {
-//         dispatch(fetchAuctionSuccess(response.data));
-//       })
-//       .catch(error => {
-//         console.log(error);
-//       })
-//   };
-// };
 
 
 
 
+export const userStatusUpdateAction = (val) => {
+  return {
+    type: UPDATE_USER,
+    payload: val
+  }
+}
 
-
-
-
-
+export const userIdUpdateAction = (val) => {
+  return {
+    type: UPDATE_USER_ID,
+    payload: val
+  }
+};

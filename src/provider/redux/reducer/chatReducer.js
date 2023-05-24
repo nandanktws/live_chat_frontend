@@ -1,28 +1,36 @@
+
 const initialState = {
-  user: false,
-  userID: null,
+  userData: null,
+  allMessage: null,
+  newMessageToLocal: null,
+
 };
-  
 
 
 
-  
+
+
 const chatManagement = (state = initialState, action) => {
+  // console.log(action,"<----------->")
   switch (action.type) {
-    case "UPDATE_USER": return {
+    case "USER_DATA": return {
       ...state,
-      user: action.payload
+      userData: action.payload
     };
-    case "UPDATE_USER_ID": return {
+    case "ALL_MESSAGE": return {
       ...state,
-      userID: action.payload
+      allMessage: action.payload
+    };
+    case "NEW_MESSAGE_TO_LOCAL": return {
+      ...state,
+      newMessageToLocal: action.payload
     };
     default: return state;
   }
 };
-  
 
 
 
-  
+
+
 export default chatManagement;

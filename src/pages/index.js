@@ -3,7 +3,10 @@ import LoginPage from './auth/LoginPage'
 const index = () => {
   return (
     <>
-      <LoginPage />
+      {/* <div suppressHydrationWarning={true}> */}
+        {/* {process.browser && <LoginPage />} */}
+        <LoginPage />
+      {/* </div> */}
     </>
   )
 }

@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import Home from '@/pages/chat/components/Home'
+import Home from '@/pages/chat/components/ChatArea'
 import Head from 'next/head'
 import { useRouter } from 'next/router';
 import { useSelector } from 'react-redux';
+import Layout from '@/components/Layout';
 
 
 
@@ -44,7 +45,9 @@ const ChatHome = () => {
 
 
 
-        <Home />
+        <Layout>
+          <Home />
+        </Layout>
 
 
 

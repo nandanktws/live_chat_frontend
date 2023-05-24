@@ -1,7 +1,8 @@
 import { logoutAction } from '@/provider/redux/action/authAction'
+import { ChatAction, allMessageUpdateAction, chatAction, newMessageToLocalUpdateAction, userDataUpdateAction } from '@/provider/redux/action/chatAction'
 import moment from 'moment/moment'
 import Image from 'next/image'
-import React, {   useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,18 +13,20 @@ let socket
 
 const Home = () => {
   const authState = useSelector((state) => state.authRootState)
+  const chatState = useSelector((state) => state.chatRootState)
   const dispatch = useDispatch()
 
-  const [allMessage, setAllMessage] = useState([])
+
+  let allMessage = chatState.allMessage
+  let userData = chatState.userData
+  let newMessageToLocal = chatState.userDatanewMessageToLocal
 
   const [myMessage, setMyMessage] = useState('')
-  const [userData, setUserData] = useState([])
-
   const [activeTabMenu, setActiveTabMenu] = useState(null)
 
 
-  // let newPickupName = createNewName();
-  // let newPickupImage = Math.floor(Math.random() * 11) + 10;
+
+  
 
 
 
@@ -37,7 +40,7 @@ const Home = () => {
 
     if (!socketAssign.current) {
       socket.on('userInfo', (e) => {
-        setUserData({ socketId: e, })
+        dispatch(userDataUpdateAction({ socketId: e }));
         socket.emit('userInfo', { socketId: e, userId: authState.userID });
       });
       socketAssign.current = true;
@@ -53,35 +56,24 @@ const Home = () => {
 
 
     socket.on('userInfo', (e) => {
-      console.log('userInfo e', e);
-      setUserData({
-        socketId: userData.socketId,
+      dispatch(userDataUpdateAction({
+        socketId: userDataUpdateAction.socketId,
         userId: e.id,
         name: e.name,
         image: e.image,
         online_status: e.online_status,
-      })
+      }));
     });
 
-    // socket.on('userChatList', (myChatsList) => {
-    //   console.log('userChatList', myChatsList);
-    //   setAllUsers(myChatsList)
-    // });
 
-
-    // let allMessageTemp = []
 
     socket.on('userChatsMessages', (e) => {
-      setAllMessage(e)
-      // allMessageTemp.push(e)
+      dispatch(allMessageUpdateAction(e))
       console.log('userChatsMessages', e);
-      // getUsersByIds(e)
     });
 
 
-    // socket.on('getUsersByIds', (e) => {
-    //   setAllUsers(e)
-    // });
+  
 
 
 
@@ -89,33 +81,17 @@ const Home = () => {
 
     socket.on('newMessage', (e) => {
       console.log('newMessage recived', e);
-      setNewMessageToLocal(e)
-
-      // console.log('newMessage set',
-      //   allMessage
-      // );
-
-
+      dispatch(newMessageToLocalUpdateAction(e))
     });
 
-
-
-
-
-
-    { console.log('userInfo state', userData) }
   }
 
+ 
 
 
 
-  const [newMessageToLocal, setNewMessageToLocal] = useState(null)
 
   useEffect(() => {
-    console.log('newMessage new', newMessageToLocal);
-    console.log('newMessage updated', allMessage);
-    console.log('newMessage close', '===================');
-
     newMessageToLocal && (
       allMessage.some((item) => item.messages !== newMessageToLocal.time)
     ) && (
@@ -125,14 +101,13 @@ const Home = () => {
           ) : item
         })
       )
-    setNewMessageToLocal(null)
-
+    dispatch(newMessageToLocalUpdateAction(null))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newMessageToLocal])
 
 
 
- 
+
 
 
 
@@ -142,10 +117,6 @@ const Home = () => {
     const curruntTime = new Date();
     if (e.keyCode === 13 && myMessage !== '' && myMessage !== ' ') {
       socket.emit('myMessage', { id: authState.userID, message: myMessage, time: curruntTime, roomId: activeTabMenu });
-      console.log('myMessage',
-        'userId:', authState.userID, 'message:', myMessage, 'time:', curruntTime, 'roomId:', activeTabMenu
-      );
-
       setMyMessage('')
     }
   }
@@ -158,7 +129,6 @@ const Home = () => {
 
 
 
-      <div className="background-green"></div>
 
 
       <div className="main-container">
@@ -166,16 +136,15 @@ const Home = () => {
 
           <div className="header">
             <div className="user-img">
-              {/* <img className="dp" src={`/users/${userData.image}`} alt={userData.name} /> */}
               <Image
                 className="dp"
-                src={`/users/${userData.image}`}
+                src={`/users/${userData?.image}`}
                 width={40}
                 height={40}
-                alt={userData.name}
+                alt={userData?.name}
               />
             </div>
-            <p className='user-name'>{userData.name}</p>
+            <p className='user-name'>{userData?.name}</p>
             {/* <div className="nav-icons">
               <li><i className="fa-solid fa-users"></i></li>
               <li><i className="fa-solid fa-message">
@@ -351,17 +320,17 @@ const Home = () => {
             <div className="nav-icons">
               <li><i className="fa-solid fa-magnifying-glass"></i></li>
               {/* <li><i className="fa-solid fa-ellipsis-vertical"></i></li> */}
-              <li><i class="fa-solid fa-arrow-right-from-bracket" onClick={()=>{dispatch(logoutAction())}}></i></li>
+              <li><i className="fa-solid fa-arrow-right-from-bracket" onClick={() => { dispatch(logoutAction()) }}></i></li>
             </div>
           </div>
 
           <div className="chat-container">
-
-            {console.log('allMessage', allMessage)}
+            {/* 
+            {console.log('allMessage', allMessage)} */}
 
             {activeTabMenu && allMessage.find((item) => item.info.room_id === activeTabMenu).messages.map((item, index) => {
               return <>
-                <div key={index} className={`message-box ${item.id === userData.userId ? 'my-message' : 'friend-message'} `}>
+                <div key={index} className={`message-box ${item.id === userData?.userId ? 'my-message' : 'friend-message'} `}>
                   <p>
                     {item.id && <><i>#{item.id}</i><br /></>}
 
